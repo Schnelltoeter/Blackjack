@@ -32,6 +32,11 @@ class Deck:
     def deal(self):
         single_card = self.deck.pop()
         return single_card
+    def print_all(self):
+        card_names = []
+        for card in self.deck:
+            card_names.append(str(card))
+        return card_names
 
 class Hand:
     def __init__(self) -> None:
@@ -59,6 +64,7 @@ class Chips:
 
 class Game:
     def __init__(self) -> None:
+        self.m = []
         self.deck = Deck()
         self.deck.shuffle()
         self.player_hand = Hand()
@@ -79,6 +85,7 @@ class Game:
     def take_bet(self):
         while True: #! DANGER
             try:
+                print('You have', self.chips.total, 'chips')
                 self.chips.bet = int(input('How many chips would you like to bet? '))
             except ValueError:
                 print('Sorry, your bet must be an integer!')
@@ -97,17 +104,23 @@ class Game:
         print(' <card hidden>')
         print(self.dealer_hand.cards[1])
         print('\nPlayer\'s Hand:', *self.player_hand.cards, sep='\n ')
+    def baum(self):
+        self.m.clear()
+        self.m.append(self.deck.print_all())
+        self.m.append(str(self.dealer_hand.cards[0]))
+        print(self.m[0].__len__() + 1)
     def player_turn(self):
         while True: #!DANGER
             print('\nYou have', self.chips.total, 'chips')
             print('Your  bet:', self.chips.bet)
+            self.baum()
             print('\nDo you want to hit or stand? Enter h or s: ')
             choice = input().lower()
             if choice == 'h':
                 self.player_hand.add_card(self.deck.deal())
                 self.show_some_cards()
+                self.player_hand.adjust_ace()
                 if self.player_hand.value > 21:
-                    # self.lose_bet()
                     break
             elif choice == 's':
                 break
@@ -116,7 +129,7 @@ class Game:
     def dealer_turn(self):
         while self.dealer_hand.value < 17:
             self.dealer_hand.add_card(self.deck.deal())
-        self.show_all_cards()
+            self.dealer_hand.adjust_ace()
     def show_all_cards(self):
         print('\nDealer\'s Hand:', *self.dealer_hand.cards, sep='\n ')
         print('Dealer\'s Hand =', self.dealer_hand.value)
