@@ -1,7 +1,6 @@
 import random
 
 
-
 SUITS = ('Hearts', 'Diamonds', 'Spades', 'Clubs')
 RANKS = ('Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace')
 VALUES = {'Two':2, 'Three':3, 'Four':4, 'Five':5, 'Six':6, 'Seven':7, 'Eight':8, 'Nine':9, 'Ten':10, 'Jack':10,
@@ -28,6 +27,15 @@ class Card:
         """
 
         return self.rank + ' of ' + self.suit
+    
+    def get_value(self):
+        """Get the value of the card.
+
+        Returns:
+            int: The numeric value of the card.
+        """
+
+        return VALUES[self.rank]
 
 class Deck:
     def __init__(self) -> None:
@@ -83,7 +91,7 @@ class Hand:
     def __init__(self) -> None:
         """Initialize a new Hand.
         """
-        self.cards = []
+        self.cards:list[Card] = []
         self.value = 0
         self.aces = 0
 
@@ -130,8 +138,12 @@ class Game:
         """Initialize a game.
         """
 
-        self.m = []
+        self.m = 0
+        """The amount of the cards remaining in the deck + 1 (for the hidden card of the dealer)."""
+        self.l = 0
+        """The amount of cards the player can draw to have a total score of <= 21."""
         self.deck = Deck()
+        """The Game Deck"""
         self.deck.shuffle()
         self.player_hand = Hand()
         self.dealer_hand = Hand()
@@ -187,14 +199,39 @@ class Game:
         print(self.dealer_hand.cards[1])
         print('\nPlayer\'s Hand:', *self.player_hand.cards, sep='\n ')
 
-    def baum(self):
+    def jufo_calculations(self):
         """IN DEVELOPMENT
         """
 
-        self.m.clear()
-        self.m.append(self.deck.print_all())
-        self.m.append(str(self.dealer_hand.cards[0]))
-        print(self.m[0].__len__() + 1)
+        self.m = 0
+        self.m = self.deck.deck.__len__() + 1
+        
+        possible_cards:list[Card] = self.deck.deck
+        possible_cards.append(self.dealer_hand.cards[0])
+        
+        copy_cards = self.player_hand.cards
+        copy_hand = Hand()
+
+        for card in copy_cards:
+            copy_hand.add_card(card)
+
+        for card in possible_cards:
+            copy_hand.add_card(card)
+            copy_hand.adjust_ace()
+
+            if copy_hand.value <= 21:
+                self.l = self.l + 1
+            
+            copy_hand = Hand()
+
+            for copied_card in copy_cards:
+                copy_hand.add_card(copied_card)
+
+        print(str(self.l) + ' possible cards')
+        
+        chance = self.l / self.m
+
+        print('The chance to draw a card that does not overbuy you is ' + str(chance*100) + '%')
 
     def player_turn(self):
         """Execute the player's turn.
@@ -203,7 +240,7 @@ class Game:
         while True: #!DANGER
             print('\nYou have', self.chips.total, 'chips')
             print('Your  bet:', self.chips.bet)
-            self.baum()
+            self.jufo_calculations()
             print('\nDo you want to hit or stand? Enter h or s: ')
             choice = input().lower()
             if choice == 'h':
@@ -264,7 +301,7 @@ class Game:
     def ask_to_play_again(self):
         """Ask the player if they want to play again.
         """
-        
+
         print('\nDo you wont to play again? Enter y or n: ')
         if input() == 'y':
             self.deck = Deck()
