@@ -72,7 +72,8 @@ class Deck:
             Card: The card given.
         """
 
-        single_card = self.deck.pop()
+        single_card = self.deck[0]
+        self.deck.__delitem__(0)
         return single_card
 
     def print_all(self):
@@ -200,12 +201,16 @@ class Game:
         print('\nPlayer\'s Hand:', *self.player_hand.cards, sep='\n ')
 
     def jufo_calculations(self):
-        """IN DEVELOPMENT
+        """Calculations for the JuFo Project
+
+        Containing the AI.
         """
 
         self.m = 0
         self.m = self.deck.deck.__len__() + 1
         
+        self.l = 0
+
         possible_cards:list[Card] = self.deck.deck
         possible_cards.append(self.dealer_hand.cards[0])
         
@@ -226,12 +231,13 @@ class Game:
 
             for copied_card in copy_cards:
                 copy_hand.add_card(copied_card)
-
-        print(str(self.l) + ' possible cards')
         
         chance = self.l / self.m
 
-        print('The chance to draw a card that does not overbuy you is ' + str(chance*100) + '%')
+        if self.player_hand.value > 18:
+            print('You should probably stay.')
+        else:
+            print('The chance to draw a card that does not overbuy you is ' + str(chance*100) + '%')
 
     def player_turn(self):
         """Execute the player's turn.
@@ -240,7 +246,7 @@ class Game:
         while True: #!DANGER
             print('\nYou have', self.chips.total, 'chips')
             print('Your  bet:', self.chips.bet)
-            self.jufo_calculations()
+            # self.jufo_calculations()
             print('\nDo you want to hit or stand? Enter h or s: ')
             choice = input().lower()
             if choice == 'h':
@@ -301,7 +307,6 @@ class Game:
     def ask_to_play_again(self):
         """Ask the player if they want to play again.
         """
-
         print('\nDo you wont to play again? Enter y or n: ')
         if input() == 'y':
             self.deck = Deck()
