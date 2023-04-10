@@ -112,10 +112,15 @@ class Hand:
     def adjust_ace(self):
         """Adjusts aces from the hand if possible and required.
         """
+        if self.value > 21 and self.aces > 0:
+            if (self.aces == self.cards.__len__()):
+                for i in range(self.cards.__len__() - 1):
+                    self.aces -= 1
+                    self.value -= 10
 
-        while self.value > 21 and self.aces > 0:
-            self.aces -= 1
-            self.value -= 10
+            else:
+                self.aces -= 1
+                self.value -= 10
 
 class Chips:
     def __init__(self) -> None:
@@ -187,8 +192,8 @@ class Game:
         """Deal 2 cards to the player and to the dealer.
         """
 
-        self.player_hand.add_card(self.deck.deal())
-        self.player_hand.add_card(self.deck.deal())
+        self.player_hand.add_card(Card("Spades", "Ace"))
+        self.player_hand.add_card(Card("Clubs", "Ten"))
         self.dealer_hand.add_card(self.deck.deal())
         self.dealer_hand.add_card(self.deck.deal())
 
@@ -304,25 +309,17 @@ class Game:
     def winner(self):
         """Check who won the game.
         """
-        global wins
-        global loses
-        global draws
 
         if self.player_hand.value > 21:
             self.lose_bet()
-            loses = loses + 1
         elif self.dealer_hand.value > 21:
             self.win_bet()
-            wins = wins + 1
         elif self.player_hand.value > self.dealer_hand.value:
             self.win_bet()
-            wins = wins + 1
         elif self.player_hand.value < self.dealer_hand.value:
             self.lose_bet()
-            loses = loses + 1
         else:
             print('It\'s a tie!')
-            draws = draws + 1
 
     def lose_bet(self):
         """Loose the bet.
