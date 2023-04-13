@@ -192,8 +192,8 @@ class Game:
         """Deal 2 cards to the player and to the dealer.
         """
 
-        self.player_hand.add_card(Card("Spades", "Ace"))
-        self.player_hand.add_card(Card("Clubs", "Ten"))
+        self.player_hand.add_card(self.deck.deal())
+        self.player_hand.add_card(self.deck.deal())
         self.dealer_hand.add_card(self.deck.deal())
         self.dealer_hand.add_card(self.deck.deal())
 
